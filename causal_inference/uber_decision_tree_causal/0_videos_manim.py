@@ -292,31 +292,27 @@ class CausalInferenceFlowchart(AllCausalFunctions):
 
 class InterruptedTimeSeriesSyntheticControl(Scene):
     def construct(self):
+        self.next_section("Start")
         Text.set_default(color=BLACK)
         self.camera.background_color = WHITE
 
-        # column_names = ['time', 'treated', 'control1', 'control2', 'control3', 'synthetic','intervention']
-
-        # path = 'video_data/1_interrupted_time_series_synthetic_control/data.csv'
         path = os.path.join(os.getcwd(), 'uber_decision_tree_causal/video_data/1_interrupted_time_series_synthetic_control/data.csv')
         df = pd.read_csv(path)
-        column_names = df.columns
+        column_names = list(df.columns)
         print(df.head())
 
 
         table = DecimalTable(
-            # [["This", "is a"],
-            # ["simple", "Table."]],
             df.head().values.tolist(),
             row_labels=[Text(str(c), color=BLACK) for c in range(df.head().shape[0])],
-            # col_labels=[Text("C1"), Text("C2")],
             col_labels=[Text(c, color=BLACK) for c in column_names],
             top_left_entry=Star().scale(0.3),
             include_outer_lines=True,
             arrange_in_grid_config={"cell_alignment": RIGHT},
             line_config={"color": BLACK},
             element_to_mobject_config={"num_decimal_places": 2, "color": BLACK}).set_color(color=BLACK).scale(0.4)
-        table.add(table.get_cell((2,2), color=RED))
+        
+        # table.add(table.get_cell((2,2), color=RED))
         
         self.play(Write(table))
 
@@ -336,80 +332,31 @@ class InterruptedTimeSeriesSyntheticControl(Scene):
         for idx, vertex in enumerate(vertices):
             if idx != 0:
                 edges.append((vertices[idx-1], vertex))
+
+        # column_names = ['time', 'treated', 'control1', 'control2', 'control3', 'synthetic','intervention']                
+        edges
+
+         # Create custom labels dictionary correctly
+        custom_labels = {vertex: Text(vertex, color=BLACK, font_size= 10) for vertex in vertices}
         
-        print({(v1, v2): {"stroke_color": BLACK} for v1, v2 in edges})
         # Create the graph with the custom layout
         graph = Graph(
             vertices, 
             edges, 
             layout=layout,
-            vertex_config={"fill_color": RED},
-            # edge_config={("v1", "v2"): {"stroke_color": BLACK}},
-            # edge_config={(v1, v2): {"stroke_color": BLACK} for v1, v2 in edges},
-            labels=True,
-            label_fill_color=BLACK
+            vertex_config={
+                "radius": 0.3,  # Set a fixed radius for all vertices
+                "fill_color": GREEN
+            },
+            edge_config={(v1, v2): {"stroke_color": BLACK} for v1, v2 in edges},
+            labels=custom_labels,
+            label_fill_color=BLACK,
         )
+        self.next_section("Create graph")
         
-        # Add both objects to the scene
-        # self.add(table)
-        # self.add(graph)
         self.play(Write(graph))
-
-        # DecimalTable.set_color(color=BLACK)
-        # decimal_table = DecimalTable(
-        #     [[1.23, 4.56], [7.89, 0.12]],
-        #     row_labels=[Text("Row 1"), Text("Row 2")],
-        #     col_labels=[Text("Column 1"), Text("Column 2")],
-        #     element_to_mobject_config={"num_decimal_places": 2, "color": BLACK},
-        #     top_left_entry=Star().scale(0.3),
-        #     line_config={"color": BLACK},
-        #     include_outer_lines=True
-        # ).set_color(color=BLACK)
-        # self.play(Write(decimal_table))
-
-from manim import *
-
-class TableGraphNetwork(Scene):
-    def construct(self):
-        # Create a table with headers
-        table = Table(
-            [["Data 1", "Data 2"], 
-             ["Data 3", "Data 4"]],
-            row_labels=[Text("R1"), Text("R2")],
-            col_labels=[Text("C1"), Text("C2")],
-            line_config={"color": BLACK}
-        )
-        
-        # Get the column labels (headers)
-        col_labels = table.get_col_labels()
-        
-        # Create vertices for the graph using the positions of column headers
-        vertices = ["v1", "v2"]
-        
-        # Create a dictionary mapping vertices to their positions
-        # (based on the column labels' positions)
-        layout = {}
-        for i, vertex in enumerate(vertices):
-            # Get the center of each column label
-            layout[vertex] = col_labels[i].get_center()
-        
-        # Create edges between vertices
-        edges = [("v1", "v2")]
-        
-        # Create the graph with the custom layout
-        graph = Graph(
-            vertices, 
-            edges, 
-            layout=layout,
-            vertex_config={"fill_color": RED},
-            edge_config={("v1", "v2"): {"stroke_color": BLACK}},
-            labels=True,
-            label_fill_color=BLACK
-        )
-        
-        # Add both objects to the scene
-        self.add(table)
-        self.add(graph)
+        self.next_section("Remove table")
+        self.play(FadeOut(table))
 
 
 # To run this animation:
